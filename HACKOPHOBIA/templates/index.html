@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>CU AI HelpDesk</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+
+body{
+background:#f1f5f9;
+font-family:Segoe UI;
+}
+
+.custom-navbar{
+background: linear-gradient(90deg,#0e52e4,#9333ea,#ec4899);
+}
+
+.hero{
+height:60vh;
+background:url("https://www.culko.in/campus-life/assets/images/cu-lko-banner.jpg") center/cover;
+display:flex;
+align-items:center;
+justify-content:center;
+color:white;
+text-align:center;
+}
+
+.card{
+border-radius:10px;
+box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+.section-title{
+font-weight:700;
+margin-top:40px;
+margin-bottom:20px;
+}
+
+.section-btn{
+border-radius:30px;
+padding:12px 25px;
+}
+
+#chatbox{
+height:200px;
+overflow:auto;
+background:white;
+padding:10px;
+border-radius:8px;
+}
+
+footer{
+background:#0f172a;
+color:white;
+padding:20px;
+text-align:center;
+margin-top:40px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
+<div class="container">
+<a class="navbar-brand">
+<i class="bi bi-mortarboard-fill"></i> CU AI HelpDesk
+</a>
+</div>
+</nav>
+
+
+<section class="hero">
+<div>
+<h1>CHANDIGARH UNIVERSITY UTTAR PRADESH</h1>
+<h2>AI ASSISTANT</h2>
+<p>Lost & Found + Complaint System</p>
+</div>
+</section>
+
+
+<div class="container mt-5">
+
+
+<!-- LOST ITEM -->
+
+<h3 class="section-title text-center">
+<i class="bi bi-search"></i> Report Lost Item
+</h3>
+
+<div class="card p-4 mb-4 text-center">
+
+<input id="lostName" class="form-control mb-3" placeholder="Your Name">
+<input id="lostUID" class="form-control mb-3" placeholder="Your UID">
+<input id="lostItem" class="form-control mb-3" placeholder="Lost Item">
+<input id="lostLocation" class="form-control mb-3" placeholder="Location Lost">
+
+<input id="lostDate" type="date" class="form-control mb-3">
+<input id="lostTime" type="time" class="form-control mb-3">
+
+<button onclick="submitLost()" class="btn btn-primary section-btn">
+Submit Lost Item
+</button>
+
+</div>
+
+
+<!-- FOUND ITEM -->
+
+<h3 class="section-title text-center">
+<i class="bi bi-box-seam"></i> Report Found Item
+</h3>
+
+<div class="card p-4 mb-4 text-center">
+
+<input id="foundName" class="form-control mb-3" placeholder="Your Name">
+<input id="foundUID" class="form-control mb-3" placeholder="Your UID">
+<input id="foundItem" class="form-control mb-3" placeholder="Item Found">
+<input id="foundLocation" class="form-control mb-3" placeholder="Location Found">
+
+<input id="foundDate" type="date" class="form-control mb-3">
+<input id="foundTime" type="time" class="form-control mb-3">
+
+<button onclick="submitFound()" class="btn btn-success section-btn">
+Submit Found Item
+</button>
+
+</div>
+
+
+<!-- COMPLAINT -->
+
+<h3 class="section-title text-center">
+<i class="bi bi-exclamation-triangle"></i> Submit Complaint
+</h3>
+
+<div class="card p-4 mb-4 text-center">
+
+<input id="complaintName" class="form-control mb-3" placeholder="Your Name">
+
+<select id="complaintType" class="form-control mb-3">
+<option>WiFi Issue</option>
+<option>Hostel Problem</option>
+<option>Classroom Issue</option>
+<option>Other</option>
+</select>
+
+<textarea id="complaintText" class="form-control mb-3" placeholder="Describe problem"></textarea>
+
+<button onclick="submitComplaint()" class="btn btn-danger section-btn">
+Submit Complaint
+</button>
+
+</div>
+
+
+<!-- AI ASSISTANT -->
+
+<h3 class="section-title text-center">
+<i class="bi bi-robot"></i> AI Campus Assistant
+</h3>
+
+<div class="card p-4 text-center">
+
+<div id="chatbox"></div>
+
+<input id="question" class="form-control mt-3" placeholder="Ask something...">
+
+<button onclick="askAI()" class="btn btn-dark section-btn mt-3">
+Ask AI
+</button>
+
+</div>
+
+</div>
+
+
+<footer>
+<p>© 2026 CU AI HelpDesk</p>
+</footer>
+
+
+<script>
+
+async function askAI(){
+
+let question=document.getElementById("question").value
+let chat=document.getElementById("chatbox")
+
+chat.innerHTML+="<p><b>You:</b> "+question+"</p>"
+
+let res=await fetch("/ask",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({question:question})
+})
+
+let data=await res.json()
+
+chat.innerHTML+="<p><b>AI:</b> "+data.reply+"</p>"
+
+}
+
+
+async function submitLost(){
+
+let res=await fetch("/lost",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+name:document.getElementById("lostName").value,
+uid:document.getElementById("lostUID").value,
+item:document.getElementById("lostItem").value,
+location:document.getElementById("lostLocation").value,
+date:document.getElementById("lostDate").value,
+time:document.getElementById("lostTime").value
+})
+})
+
+let data=await res.json()
+
+alert(data.status)
+
+}
+
+
+async function submitFound(){
+
+let res=await fetch("/found",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+name:document.getElementById("foundName").value,
+uid:document.getElementById("foundUID").value,
+item:document.getElementById("foundItem").value,
+location:document.getElementById("foundLocation").value,
+date:document.getElementById("foundDate").value,
+time:document.getElementById("foundTime").value
+})
+})
+
+let data=await res.json()
+
+alert(data.status)
+
+}
+
+
+async function submitComplaint(){
+
+let res=await fetch("/complaint",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+name:document.getElementById("complaintName").value,
+subject:document.getElementById("complaintType").value,
+message:document.getElementById("complaintText").value
+})
+})
+
+let data=await res.json()
+
+alert(data.status)
+
+}
+
+</script>
+
+</body>
+</html>
